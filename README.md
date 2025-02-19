@@ -3,6 +3,7 @@
 ## *Technologies*
 
 ### Node.js - Express.js - Typescript - Apollo Fedration - Apollo Router - subgraphs - supergraph
+>To get start run ( docker compose up )
 
 ## *Description*
 
