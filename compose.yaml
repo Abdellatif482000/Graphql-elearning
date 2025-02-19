@@ -1,0 +1,131 @@
+version: '3.8'
+
+services:
+  # ------------ Users -----------------
+  users_service:
+    build:
+      context: ./usersService
+      dockerfile: Dockerfile
+      target: dev
+    container_name: users-subgraph-container
+    networks:
+      - e_learning_app_network
+      - users_Network
+    ports:
+      - "8083:8083"
+    volumes:
+      - ./usersService:/app/
+    depends_on:
+      - users_psql
+
+  users_psql:
+    image: postgres:latest
+    container_name: users_psql_container
+    restart: always
+    networks:
+      - users_Network
+    volumes:
+      - users_psql_volume:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: psql
+      POSTGRES_PASSWORD: psql123
+      POSTGRES_DB: users-db
+  # ---------------------------------------
+
+  # ------------ Quizzes -----------------
+  quizzes_service:
+    build:
+      context: ./quizzesService
+      dockerfile: Dockerfile
+      target: dev
+    container_name: quizzes-subgraph-container
+    networks:
+      - e_learning_app_network
+      - quizzes_Network
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./quizzesService:/app/
+    depends_on:
+      - quizzes_psql
+
+  quizzes_psql:
+    image: postgres:latest
+    restart: always
+    networks:
+      - quizzes_Network
+    volumes:
+      - quizzes_psql_volume:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: psql
+      POSTGRES_PASSWORD: psql123
+      POSTGRES_DB: quiz-db
+  # ---------------------------------------
+
+  # ------------ Tutorials -----------------
+  tutorials_service:
+    build:
+      context: ./tutorialService
+      dockerfile: Dockerfile
+      target: dev
+    container_name: tutorials-subgraph-container
+    networks:
+      - e_learning_app_network
+      - tutorials_Network
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./tutorialService:/app/
+    depends_on:
+      - tutorials_psql
+
+  tutorials_psql:
+    image: postgres:latest
+    restart: always
+    networks:
+      - tutorials_Network
+    volumes:
+      - tutorials_psql_volume:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: psql
+      POSTGRES_PASSWORD: psql123
+      POSTGRES_DB: tutorials-db
+    # ---------------------------------------
+
+    # apollo_router:
+    #   # image: ghcr.io/apollographql/router:v1.47.0
+    #   image: ghcr.io/apollographql/router:v1.60.0
+    #   ports:
+    #     - "4000:4000"
+    #   networks:
+    #     - e_learning_app_network
+    #   environment:
+    #     - APOLLO_GRAPH_REF=e-learing-app@current
+    #     - APOLLO_KEY=service:e-learing-app:Pukiv5E9Wc64ooXTQB7UXw
+    #     - APOLLO_ROUTER_LOG=debug
+    # volumes:
+    #   - ./supergraph.graphql:/dist/config/supergraph.graphql
+    # command: --dev -s /dist/config/supergraph.graphql
+    # restart: always
+    # ---------------------------------------
+
+networks:
+  e_learning_app_network:
+    driver: bridge
+  users_Network:
+    driver: bridge
+  quizzes_Network:
+    driver: bridge
+  tutorials_Network:
+    driver: bridge
+
+volumes:
+  quizzes_psql_volume:
+  tutorials_psql_volume:
+  users_psql_volume:

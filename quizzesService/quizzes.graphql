@@ -1,0 +1,51 @@
+# ./schema/schema.graphql
+extend schema
+  @link(url: "http://specs.apollo.dev/federation/v2.0", import: ["@key"])
+directive @include(if: Boolean!) on FIELD
+#--------------------
+type Quiz {
+  quizID: ID!
+  questions: [Question]
+}
+
+type Question {
+  questionID: ID!
+  questionType: String
+  questionText: String
+  answers: Ansewers
+}
+type Ansewers {
+  optionA: String
+  optionB: String
+  optionC: String
+  optionD: String
+  optionE: String
+}
+#--------------------
+input QuizInput {
+  quizID: ID!
+  questions: [QuestionInput]
+}
+input QuestionInput {
+  questionID: ID!
+  questionType: String
+  questionText: String
+  answers: AnswerInput
+}
+input AnswerInput {
+  optionA: String
+  optionB: String
+  optionC: String
+  optionD: String
+  optionE: String
+}
+#--------------------
+type Query {
+  quizzes: [Quiz]
+  getQuizById(id: ID!): Quiz
+}
+
+type Mutation {
+  createQuiz(input: QuizInput!): Quiz
+  editQuestion(input: QuestionInput!, quizID: ID!): Quiz
+}

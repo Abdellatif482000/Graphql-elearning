@@ -1,0 +1,54 @@
+extend schema
+  @link(url: "http://specs.apollo.dev/federation/v2.0", import: ["@key"])
+directive @include(if: Boolean!) on FIELD
+
+# ---------- Types -----------------
+type User {
+  userID: ID!
+  username: String
+  email: String
+  password: String
+  scores: [Score]
+  role: String
+}
+
+type Score {
+  quizID: ID!
+  userID: ID!
+  score: Int
+  data: String
+}
+# _____________________________________
+
+# ----------- inputs ----------------
+input UserInput {
+  userID: ID!
+  username: String
+  email: String
+  password: String
+  role: String
+  scores: [ScoreInput]
+}
+
+input ScoreInput {
+  quizID: ID!
+  userID: ID!
+  score: Int
+  data: String
+}
+
+input SigninInput {
+  email: String
+  password: String
+}
+# _____________________________________
+
+type Query {
+  users: [User]
+  scores: [Score]
+  signin(singinData: SigninInput): User
+}
+
+type Mutation {
+  signup(userData: UserInput): User
+}
