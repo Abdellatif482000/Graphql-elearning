@@ -2,7 +2,7 @@
 
 ## Technologies
 
-### Node.js - Express.js - Typescript ### Apollo Fedration - Apollo Router - subgraphs - supergraph
+### Node.js - Express.js - Typescript - Apollo Fedration - Apollo Router - subgraphs - supergraph
 
 ## Description
 
