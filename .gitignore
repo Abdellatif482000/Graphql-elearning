@@ -1,5 +1,9 @@
-./quizzesService/node_modules
-./tutorialService/node_modules
-./usersService/node_modules
+./*/node_modules
+
+
 # Keep environment variables out of version control
 .env
+
+./router-v1.60.0-x86_64-unknown-linux-gnu.tar.gz
+./licenses.html
+./LICENSE
