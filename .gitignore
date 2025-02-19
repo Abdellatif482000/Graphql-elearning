@@ -1,0 +1,5 @@
+./quizzesService/node_modules
+./tutorialService/node_modules
+./usersService/node_modules
+# Keep environment variables out of version control
+.env
