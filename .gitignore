@@ -4,10 +4,10 @@
 # Keep environment variables out of version control
 .env
 
-./router-v1.60.0-x86_64-unknown-linux-gnu.tar.gz
-./licenses.html
-./LICENSE
+router-v1.60.0-x86_64-unknown-linux-gnu.tar.gz
+licenses.html
+LICENSE
 .vscode
 
-/build/
+
 **/dist/
