@@ -1,0 +1,146 @@
+version: '3.8'
+
+services:
+  # ------------ Users -----------------
+  user_service:
+    build:
+      context: ./userService
+      dockerfile: Dockerfile
+      target: dev
+    container_name: users-subgraph-container
+    networks:
+      - e_learning_app_network
+      - user_service_Network
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./userService:/app/
+    depends_on:
+      - user_psql
+    env_file:
+      - .env
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+
+  user_psql:
+    image: postgres:latest
+    container_name: user_psql_container
+    restart: always
+    networks:
+      - user_service_Network
+    volumes:
+      - user_psql_volume:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: psql
+      POSTGRES_PASSWORD: psql123
+      POSTGRES_DB: user-db
+  # ---------------------------------------
+
+  # ------------ Quizzes -----------------
+  quiz_service:
+    build:
+      context: ./quizService
+      dockerfile: Dockerfile
+      target: dev
+    container_name: quiz-subgraph-container
+    networks:
+      - e_learning_app_network
+      - quiz_service_Network
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./quizService:/app/
+    depends_on:
+      - quiz_psql
+    env_file:
+      - .env
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+
+  quiz_psql:
+    image: postgres:latest
+    container_name: quiz_psql_container
+    restart: always
+    networks:
+      - quiz_service_Network
+    volumes:
+      - quiz_psql_volume:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: psql
+      POSTGRES_PASSWORD: psql123
+      POSTGRES_DB: quiz-db
+  # ---------------------------------------
+
+  # ------------ Tutorials -----------------
+  course_service:
+    build:
+      context: ./courseService
+      dockerfile: Dockerfile
+      target: dev
+    container_name: course-subgraph-container
+    networks:
+      - e_learning_app_network
+      - course_service_Network
+    ports:
+      - "8083:8083"
+    volumes:
+      - ./courseService:/app/
+    depends_on:
+      - course_psql
+    env_file:
+      - .env
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+
+  course_psql:
+    image: postgres:latest
+    container_name: course_psql_container
+    restart: always
+    networks:
+      - course_service_Network
+    volumes:
+      - course_psql_volume:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: psql
+      POSTGRES_PASSWORD: psql123
+      POSTGRES_DB: course-db
+    # ---------------------------------------
+
+  apollo_router:
+    # image: ghcr.io/apollographql/router:v1.47.0
+    image: ghcr.io/apollographql/router:v1.60.0
+    ports:
+      - "4000:4000"
+    networks:
+      - e_learning_app_network
+    volumes:
+      - ./supergraph.graphql:/dist/schema/supergraph.graphql
+      - ./router.yaml:/dist/config/router.yaml
+    command: --dev -c /dist/config/router.yaml -s /dist/schema/supergraph.graphql
+    restart: always
+      #   environment:
+      #     - APOLLO_GRAPH_REF=e-learing-app@current
+      #     - APOLLO_KEY=service:e-learing-app:Pukiv5E9Wc64ooXTQB7UXw
+      #     - APOLLO_ROUTER_LOG=debug
+      # ---------------------------------------
+
+networks:
+  e_learning_app_network:
+    driver: bridge
+  user_service_Network:
+    driver: bridge
+  quiz_service_Network:
+    driver: bridge
+  course_service_Network:
+    driver: bridge
+
+volumes:
+  quiz_psql_volume:
+  course_psql_volume:
+  user_psql_volume:

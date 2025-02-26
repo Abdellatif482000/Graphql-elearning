@@ -1,0 +1,49 @@
+extend schema
+  @link(
+    url: "http://specs.apollo.dev/federation/v2.0"
+    import: ["@key", "@authenticated", "@requiresScopes"]
+  )
+directive @include(if: Boolean!) on FIELD
+directive @authenticated on OBJECT | FIELD_DEFINITION | INTERFACE | SCALAR | ENUM
+
+scalar federation__Scope
+directive @requiresScopes(
+  scopes: [[federation__Scope!]!]!
+) on OBJECT | FIELD_DEFINITION | INTERFACE | SCALAR | ENUM
+
+# ---------- Types -----------------
+type User @key(fields: userID) {
+  userID: ID!
+  username: String
+  email: String
+  role: String
+}
+
+type Signin {
+  token: String
+}
+# _____________________________________
+
+# ----------- inputs ----------------
+input UserInput {
+  username: String!
+  email: String!
+  password: String!
+  role: String!
+}
+
+input SigninInput {
+  email: String
+  password: String
+}
+# ____________________________________
+
+type Query {
+  userByID(id: ID): User
+  users: [User]
+  signin(role: String, singinData: SigninInput): Signin
+}
+
+type Mutation {
+  signup(userData: UserInput): User
+}

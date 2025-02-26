@@ -1,0 +1,17 @@
+federation_version: 2
+subgraphs:
+  user_subgraph:
+    routing_url: http://users-subgraph-container:8081/userGraphql
+    schema:
+      file: ./userService/src/graphql/user.graphql
+
+  course_subgraph:
+    routing_url: http://course-subgraph-container:8083/courseGraphql
+    schema:
+      file: ./courseService/src/graphql/course.graphql
+  quiz_subgraph:
+    routing_url: http://quiz-subgraph-container:8082/quizGraphql
+    schema:
+      file: ./quizService/src/graphql/quiz.graphql
+include_headers:
+  - authorization

@@ -1,0 +1,41 @@
+# ./schema/schema.graphql
+extend schema
+  @link(url: "http://specs.apollo.dev/federation/v2.0", import: ["@key"])
+directive @include(if: Boolean!) on FIELD
+#--------------------
+type Tutorial {
+  tutID: ID!
+  topicTitle: String
+  description: String
+  paragraphs: [paragraph]
+  authorId: ID!
+  category: String
+}
+
+type paragraph {
+  paragID: ID!
+  title: String
+  content: String
+}
+# --------------------------------------
+input TutorialInputs {
+  tutID: ID!
+  topicTitle: String
+  description: String
+  paragraphs: [paragraphInputs]
+}
+input paragraphInputs {
+  paragID: ID!
+  title: String
+  content: String
+}
+
+# --------------------------------------
+type Query {
+  tutorials: [Tutorial]
+  getTutById(id: ID!): Tutorial
+}
+
+type Mutation {
+  createTut(tutData: TutorialInputs): Tutorial
+}

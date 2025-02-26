@@ -1,0 +1,16 @@
+supergraph:
+  introspection: true
+  listen: 0.0.0.0:4000
+
+include_subgraph_errors:
+  all: true
+plugins:
+  # Enable with the header, Apollo-Expose-Query-Plan: true
+  experimental.expose_query_plan: true
+
+headers:
+  # subgraphs:
+  all:
+    request:
+      - propagate:
+          named: authorization

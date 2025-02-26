@@ -1,0 +1,47 @@
+{
+  "quiz": {
+    "quizID": 1,
+    "title": "General Knowledge Quiz",
+    "difficulty": "Medium",
+    "questionsNum": 2,
+    "totalScore": 20,
+    "questions": [
+      {
+        "id": 101,
+        "question": "What is the capital of France?",
+        "quizId": 1,
+        "answers": [
+          {
+            "id": 1001,
+            "optionA": "Paris",
+            "optionB": "Berlin",
+            "optionC": "Madrid",
+            "optionD": "Rome",
+            "optionE": "Lisbon",
+            "optionF": "Vienna",
+            "correctAnswer": "Paris",
+            "questionId": 101
+          }
+        ]
+      },
+      {
+        "id": 102,
+        "question": "Which planet is known as the Red Planet?",
+        "quizId": 1,
+        "answers": [
+          {
+            "id": 1002,
+            "optionA": "Earth",
+            "optionB": "Mars",
+            "optionC": "Jupiter",
+            "optionD": "Saturn",
+            "optionE": "Venus",
+            "optionF": "Neptune",
+            "correctAnswer": "Mars",
+            "questionId": 102
+          }
+        ]
+      }
+    ]
+  }
+}

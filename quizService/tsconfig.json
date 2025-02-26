@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", // Target JavaScript version
+    "module": "ESNext", // Module system (e.g., CommonJS or ES6)
+    "moduleResolution": "node",
+
+    "allowSyntheticDefaultImports": true,
+    "allowArbitraryExtensions": true,
+    "outDir": "./dist", // Output directory for compiled files
+    "rootDir": "./src", // Root directory of TypeScript files
+    "baseUrl": "./src",
+    "paths": {
+      "@src/*": ["./*"]
+    },
+    "strict": true, // Enable strict type-checking
+    "esModuleInterop": true, // Support for default imports from CommonJS
+    "skipLibCheck": true, // Skip type checking of .d.ts files
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "allowJs": true
+    // "allowImportingTsExtensions": true,
+    // "declaration": true
+
+    // "emitDeclarationOnly": true
+  },
+  "include": ["src/**/*"], // Files or directories to compile
+  "exclude": ["node_modules"] // Excluded files or directories
+}

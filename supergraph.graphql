@@ -1,0 +1,210 @@
+schema
+  @link(url: "https://specs.apollo.dev/link/v1.0")
+  @link(url: "https://specs.apollo.dev/join/v0.3", for: EXECUTION)
+{
+  query: Query
+  mutation: Mutation
+}
+
+directive @join__enumValue(graph: join__Graph!) repeatable on ENUM_VALUE
+
+directive @join__field(graph: join__Graph, requires: join__FieldSet, provides: join__FieldSet, type: String, external: Boolean, override: String, usedOverridden: Boolean) repeatable on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+directive @join__graph(name: String!, url: String!) on ENUM_VALUE
+
+directive @join__implements(graph: join__Graph!, interface: String!) repeatable on OBJECT | INTERFACE
+
+directive @join__type(graph: join__Graph!, key: join__FieldSet, extension: Boolean! = false, resolvable: Boolean! = true, isInterfaceObject: Boolean! = false) repeatable on OBJECT | INTERFACE | UNION | ENUM | INPUT_OBJECT | SCALAR
+
+directive @join__unionMember(graph: join__Graph!, member: String!) repeatable on UNION
+
+directive @link(url: String, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
+
+type Ansewers
+  @join__type(graph: QUIZ_SUBGRAPH)
+{
+  answerListID: Int
+  optionA: String
+  optionB: String
+  optionC: String
+  optionD: String
+  optionE: String
+  optionF: String
+  correctAnswer: String
+}
+
+input AnswerInput
+  @join__type(graph: QUIZ_SUBGRAPH)
+{
+  answerListID: Int
+  optionA: String
+  optionB: String
+  optionC: String
+  optionD: String
+  optionE: String
+  optionF: String
+  correctAnswer: String
+}
+
+scalar join__FieldSet
+
+enum join__Graph {
+  COURSE_SUBGRAPH @join__graph(name: "course_subgraph", url: "http://course-subgraph-container:8083/courseGraphql")
+  QUIZ_SUBGRAPH @join__graph(name: "quiz_subgraph", url: "http://quiz-subgraph-container:8082/quizGraphql")
+  USER_SUBGRAPH @join__graph(name: "user_subgraph", url: "http://users-subgraph-container:8081/userGraphql")
+}
+
+scalar link__Import
+
+enum link__Purpose {
+  """
+  `SECURITY` features provide metadata necessary to securely resolve fields.
+  """
+  SECURITY
+
+  """
+  `EXECUTION` features provide metadata necessary for operation execution.
+  """
+  EXECUTION
+}
+
+type Mutation
+  @join__type(graph: COURSE_SUBGRAPH)
+  @join__type(graph: QUIZ_SUBGRAPH)
+  @join__type(graph: USER_SUBGRAPH)
+{
+  createTut(tutData: TutorialInputs): Tutorial @join__field(graph: COURSE_SUBGRAPH)
+  createQuiz(role: String!, quizData: QuizInput!): Quiz @join__field(graph: QUIZ_SUBGRAPH)
+  editQuestion(input: QuestionInput!, quizID: ID!): Quiz @join__field(graph: QUIZ_SUBGRAPH)
+  signup(userData: UserInput): User @join__field(graph: USER_SUBGRAPH)
+}
+
+type paragraph
+  @join__type(graph: COURSE_SUBGRAPH)
+{
+  paragID: ID!
+  title: String
+  content: String
+}
+
+input paragraphInputs
+  @join__type(graph: COURSE_SUBGRAPH)
+{
+  paragID: ID!
+  title: String
+  content: String
+}
+
+type Query
+  @join__type(graph: COURSE_SUBGRAPH)
+  @join__type(graph: QUIZ_SUBGRAPH)
+  @join__type(graph: USER_SUBGRAPH)
+{
+  tutorials: [Tutorial] @join__field(graph: COURSE_SUBGRAPH)
+  getTutById(id: ID!): Tutorial @join__field(graph: COURSE_SUBGRAPH)
+  quizzes: [Quiz] @join__field(graph: QUIZ_SUBGRAPH)
+  getQuizById(id: ID!): Quiz @join__field(graph: QUIZ_SUBGRAPH)
+  userByID(id: ID): User @join__field(graph: USER_SUBGRAPH)
+  users: [User] @join__field(graph: USER_SUBGRAPH)
+  signin(role: String, singinData: SigninInput): Signin @join__field(graph: USER_SUBGRAPH)
+}
+
+type Question
+  @join__type(graph: QUIZ_SUBGRAPH)
+{
+  questionID: ID!
+  questionType: String
+  questionText: String
+  answers: Ansewers
+}
+
+input QuestionInput
+  @join__type(graph: QUIZ_SUBGRAPH)
+{
+  questionID: ID!
+  questionType: String
+  questionText: String
+  answers: AnswerInput
+}
+
+type Quiz
+  @join__type(graph: QUIZ_SUBGRAPH, key: "quizID")
+{
+  quizID: ID!
+  title: String
+  difficulty: String
+  questionsNum: Int
+  totalScore: Int
+  questions: [Question]
+}
+
+input QuizInput
+  @join__type(graph: QUIZ_SUBGRAPH)
+{
+  quizID: ID!
+  title: String
+  difficulty: String
+  questionsNum: Int
+  totalScore: Int
+  questions: [QuestionInput]
+}
+
+type Score
+  @join__type(graph: QUIZ_SUBGRAPH)
+{
+  scoreID: ID
+  score: Int
+}
+
+type Signin
+  @join__type(graph: USER_SUBGRAPH)
+{
+  token: String
+}
+
+input SigninInput
+  @join__type(graph: USER_SUBGRAPH)
+{
+  email: String
+  password: String
+}
+
+type Tutorial
+  @join__type(graph: COURSE_SUBGRAPH)
+{
+  tutID: ID!
+  topicTitle: String
+  description: String
+  paragraphs: [paragraph]
+  authorId: ID!
+  category: String
+}
+
+input TutorialInputs
+  @join__type(graph: COURSE_SUBGRAPH)
+{
+  tutID: ID!
+  topicTitle: String
+  description: String
+  paragraphs: [paragraphInputs]
+}
+
+type User
+  @join__type(graph: QUIZ_SUBGRAPH, key: "userID")
+  @join__type(graph: USER_SUBGRAPH, key: "userID")
+{
+  userID: ID! @join__field(graph: QUIZ_SUBGRAPH, external: true) @join__field(graph: USER_SUBGRAPH)
+  scores: [Score] @join__field(graph: QUIZ_SUBGRAPH)
+  username: String @join__field(graph: USER_SUBGRAPH)
+  email: String @join__field(graph: USER_SUBGRAPH)
+  role: String @join__field(graph: USER_SUBGRAPH)
+}
+
+input UserInput
+  @join__type(graph: USER_SUBGRAPH)
+{
+  username: String!
+  email: String!
+  password: String!
+  role: String!
+}
