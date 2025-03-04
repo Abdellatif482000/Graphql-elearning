@@ -1,0 +1,26 @@
+# ./schema/schema.graphql
+extend schema
+  @link(url: "http://specs.apollo.dev/federation/v2.0", import: ["@key"])
+directive @include(if: Boolean!) on FIELD
+#--------------------
+type Score @key(fields: scoreID) {
+  scoreID: ID!
+  userID: ID!
+  quizID: ID!
+  quizName: String
+  score: Int
+  date: String
+}
+extend type User @key(fields: userID) {
+  userID: ID! @external
+  scores: [Score]
+}
+
+#--------------------
+type Query {
+  scores: [Score]
+}
+
+# type Mutation {
+
+# }

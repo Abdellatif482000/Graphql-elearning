@@ -10,7 +10,7 @@ import { injectable } from "inversify";
 import "reflect-metadata";
 
 @injectable()
-export class UserService {
+export class UserHelper {
   async hashPass(userPass: string) {
     // ----------- hashing Pass ---------------
     const salt = await bcrypt.genSalt(10);
@@ -38,7 +38,7 @@ export class UserService {
     try {
       if (!token) return "Token not found";
 
-      const decode = await jwt.verify(token, process.env.JWT_SECRET);
+      const decode = await jwt.verify(token, process.env.JWT_SECRET as string);
       if (decode) {
         return decode;
       }

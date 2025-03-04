@@ -49,7 +49,7 @@ const startServer = async () => {
     "/courseGraphql",
     expressMiddleware(apolloServer, {
       context: async ({ req, res }) => {
-        return req;
+        return { token: req.headers.authorization };
       },
     }) as unknown as RequestHandler
   );

@@ -18,3 +18,9 @@ export interface userSessionData {
 }
 
 export interface ScoreCreateInput {}
+
+export enum Role {
+  STUDENT = "STUDENT",
+  ADMIN = "ADMIN",
+  INSTRUCTOR = "INSTRUCTOR",
+}

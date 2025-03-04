@@ -11,20 +11,7 @@ import { QuizResolver } from "../resolverClass.js";
 const resolverClass = QuizContainer.get(QuizResolver);
 
 const resolvers = {
-  User: {
-    scores: async (asd: any, args: any) => {
-      return [
-        {
-          scoreID: "1",
-          score: 95,
-        },
-        {
-          scoreID: "2",
-          score: 88,
-        },
-      ];
-    },
-  },
+
   Query: {
     quizzes: () => [
       {

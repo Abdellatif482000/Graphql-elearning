@@ -9,14 +9,16 @@ datasource db {
 }
 
 model User {
-  userID   Int    @id @default(autoincrement())
-  email    String @unique
-  username String
-  password String
-  role     String
+  userID    String @id @unique
+  email     String @unique
+  username  String
+  password  String
+  role      Role
+  createdAt String
 }
 
-model asd {
-  asdID Int    @id @default(autoincrement())
-  scd   String
+enum Role {
+  STUDENT
+  ADMIN
+  INSTRUCTOR
 }

@@ -59,7 +59,7 @@ const startServer = async () => {
     expressMiddleware(apolloServer, {
       context: async ({ req, res }) => {
         // const authHeader: any = req.headers;
-
+        // log(req.headers);
         return { token: req.headers.authorization };
       },
     }) as unknown as RequestHandler

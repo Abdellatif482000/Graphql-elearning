@@ -8,22 +8,23 @@ const resolverClass = UserContainer.get(UserResolver);
 
 const resolvers = {
   Query: {
-    userByID: async (_: any, args: any) => {
-      return {
-        userID: "userID",
-        username: "username",
-        email: "email",
-        role: "role",
-        // scores: [],
-      };
-    },
+    usersListForAdmin: async (_: any, args: any, context: any) =>
+      await resolverClass.usersListForAdmin(context.token),
+
+    userByIDForAdmin: async (_: any, args: any, context: any) =>
+      await resolverClass.userByIDForAdmin(
+        context.token,
+
+        args.targetUserID
+      ),
     signin: async (_: any, args: any) =>
       await resolverClass.signin(args.role, args.singinData),
   },
 
   Mutation: {
-    signup: async (_: any, args: any) =>
-      await resolverClass.signup(args.userData),
+    registerUser: async (_: any, args: any) =>
+      await resolverClass.registerUser(args.role, args.userData),
+    // deleteUser:async (_: any, args: any) =>await
   },
 };
 

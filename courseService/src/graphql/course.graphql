@@ -3,39 +3,69 @@ extend schema
   @link(url: "http://specs.apollo.dev/federation/v2.0", import: ["@key"])
 directive @include(if: Boolean!) on FIELD
 #--------------------
-type Tutorial {
-  tutID: ID!
-  topicTitle: String
+type Course {
+  courseID: ID!
+  instructorID: ID!
+  courseTitle: String
   description: String
-  paragraphs: [paragraph]
-  authorId: ID!
+  paragraphs: [Paragraph]
   category: String
+  createdAt: String
+  updatedAt: String
 }
 
-type paragraph {
+type Paragraph {
   paragID: ID!
   title: String
   content: String
+  "as a link"
+  image: String
 }
+
+type Enrollment {
+  enrollmentID: ID!
+  course: Course!
+  enrolledAt: String!
+}
+extend type User @key(fields: userID) {
+  userID: ID! @external
+  enrollments: [Enrollment]
+  coursesCreatedBy: [Course]
+}
+
 # --------------------------------------
-input TutorialInputs {
-  tutID: ID!
-  topicTitle: String
+input CourseInput {
+  courseID: ID!
+  instructorID: ID!
+  courseTitle: String
   description: String
-  paragraphs: [paragraphInputs]
+  category: String
 }
-input paragraphInputs {
-  paragID: ID!
+input ParagraphInput {
+  paragID: ID
   title: String
   content: String
+  "as a link"
+  image: String
 }
 
 # --------------------------------------
 type Query {
-  tutorials: [Tutorial]
-  getTutById(id: ID!): Tutorial
+  courses: [Course]
+
+  coursesByCategory: [Course]
+  coursesByInstructor: [Course]
+  courseById(id: ID!): Course
+
+  enrollmentsByCourse: [Enrollment]
+  enrollmentsByUser: [Enrollment]
 }
 
 type Mutation {
-  createTut(tutData: TutorialInputs): Tutorial
+  enrollCourse(courseId: ID!): Enrollment!
+
+  createCourse(courseDetails: CourseInput, paragraphs: [ParagraphInput]): Course
+  updateCourseDetailes(courseDetails: CourseInput): Course!
+  updateParagraph(paragraph: ParagraphInput): Paragraph!
+  deleteCourse(courseID: ID!): String!
 }

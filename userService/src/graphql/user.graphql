@@ -11,25 +11,35 @@ directive @requiresScopes(
   scopes: [[federation__Scope!]!]!
 ) on OBJECT | FIELD_DEFINITION | INTERFACE | SCALAR | ENUM
 
+scalar DateTime
+
 # ---------- Types -----------------
 type User @key(fields: userID) {
   userID: ID!
   username: String
   email: String
-  role: String
+  role: Role
+  createdAt: DateTime!
+}
+
+enum Role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
 }
 
 type Signin {
   token: String
+  userData: User
 }
 # _____________________________________
 
 # ----------- inputs ----------------
 input UserInput {
+  userID: ID!
   username: String!
   email: String!
   password: String!
-  role: String!
 }
 
 input SigninInput {
@@ -39,11 +49,13 @@ input SigninInput {
 # ____________________________________
 
 type Query {
-  userByID(id: ID): User
-  users: [User]
-  signin(role: String, singinData: SigninInput): Signin
+  usersListForAdmin: [User]
+  userByIDForAdmin(id: ID): User
+
+  signin(role: Role, singinData: SigninInput): Signin
 }
 
 type Mutation {
-  signup(userData: UserInput): User
+  registerUser(role: Role, userData: UserInput): User
+  deleteUser(id: ID!): Boolean!
 }

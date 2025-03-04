@@ -46,9 +46,44 @@ input AnswerInput
   correctAnswer: String
 }
 
+type Course
+  @join__type(graph: COURSE_SUBGRAPH)
+{
+  courseID: ID!
+  instructorID: ID!
+  courseTitle: String
+  description: String
+  paragraphs: [Paragraph]
+  category: String
+  createdAt: String
+  updatedAt: String
+}
+
+input CourseInput
+  @join__type(graph: COURSE_SUBGRAPH)
+{
+  courseID: ID!
+  instructorID: ID!
+  courseTitle: String
+  description: String
+  category: String
+}
+
+scalar DateTime
+  @join__type(graph: USER_SUBGRAPH)
+
+type Enrollment
+  @join__type(graph: COURSE_SUBGRAPH)
+{
+  enrollmentID: ID!
+  course: Course!
+  enrolledAt: String!
+}
+
 scalar join__FieldSet
 
 enum join__Graph {
+  ACHIEVEMENT_SUBGRAPH @join__graph(name: "achievement_subgraph", url: "http://achievement-subgraph-container:8084/achievementGraphql")
   COURSE_SUBGRAPH @join__graph(name: "course_subgraph", url: "http://course-subgraph-container:8083/courseGraphql")
   QUIZ_SUBGRAPH @join__graph(name: "quiz_subgraph", url: "http://quiz-subgraph-container:8082/quizGraphql")
   USER_SUBGRAPH @join__graph(name: "user_subgraph", url: "http://users-subgraph-container:8081/userGraphql")
@@ -73,40 +108,57 @@ type Mutation
   @join__type(graph: QUIZ_SUBGRAPH)
   @join__type(graph: USER_SUBGRAPH)
 {
-  createTut(tutData: TutorialInputs): Tutorial @join__field(graph: COURSE_SUBGRAPH)
+  enrollCourse(courseId: ID!): Enrollment! @join__field(graph: COURSE_SUBGRAPH)
+  createCourse(courseDetails: CourseInput, paragraphs: [ParagraphInput]): Course @join__field(graph: COURSE_SUBGRAPH)
+  updateCourseDetailes(courseDetails: CourseInput): Course! @join__field(graph: COURSE_SUBGRAPH)
+  updateParagraph(paragraph: ParagraphInput): Paragraph! @join__field(graph: COURSE_SUBGRAPH)
+  deleteCourse(courseID: ID!): String! @join__field(graph: COURSE_SUBGRAPH)
   createQuiz(role: String!, quizData: QuizInput!): Quiz @join__field(graph: QUIZ_SUBGRAPH)
   editQuestion(input: QuestionInput!, quizID: ID!): Quiz @join__field(graph: QUIZ_SUBGRAPH)
-  signup(userData: UserInput): User @join__field(graph: USER_SUBGRAPH)
+  registerUser(role: Role, userData: UserInput): User @join__field(graph: USER_SUBGRAPH)
+  deleteUser(id: ID!): Boolean! @join__field(graph: USER_SUBGRAPH)
 }
 
-type paragraph
+type Paragraph
   @join__type(graph: COURSE_SUBGRAPH)
 {
   paragID: ID!
   title: String
   content: String
+
+  """as a link"""
+  image: String
 }
 
-input paragraphInputs
+input ParagraphInput
   @join__type(graph: COURSE_SUBGRAPH)
 {
-  paragID: ID!
+  paragID: ID
   title: String
   content: String
+
+  """as a link"""
+  image: String
 }
 
 type Query
+  @join__type(graph: ACHIEVEMENT_SUBGRAPH)
   @join__type(graph: COURSE_SUBGRAPH)
   @join__type(graph: QUIZ_SUBGRAPH)
   @join__type(graph: USER_SUBGRAPH)
 {
-  tutorials: [Tutorial] @join__field(graph: COURSE_SUBGRAPH)
-  getTutById(id: ID!): Tutorial @join__field(graph: COURSE_SUBGRAPH)
+  scores: [Score] @join__field(graph: ACHIEVEMENT_SUBGRAPH)
+  courses: [Course] @join__field(graph: COURSE_SUBGRAPH)
+  coursesByCategory: [Course] @join__field(graph: COURSE_SUBGRAPH)
+  coursesByInstructor: [Course] @join__field(graph: COURSE_SUBGRAPH)
+  courseById(id: ID!): Course @join__field(graph: COURSE_SUBGRAPH)
+  enrollmentsByCourse: [Enrollment] @join__field(graph: COURSE_SUBGRAPH)
+  enrollmentsByUser: [Enrollment] @join__field(graph: COURSE_SUBGRAPH)
   quizzes: [Quiz] @join__field(graph: QUIZ_SUBGRAPH)
   getQuizById(id: ID!): Quiz @join__field(graph: QUIZ_SUBGRAPH)
-  userByID(id: ID): User @join__field(graph: USER_SUBGRAPH)
-  users: [User] @join__field(graph: USER_SUBGRAPH)
-  signin(role: String, singinData: SigninInput): Signin @join__field(graph: USER_SUBGRAPH)
+  usersListForAdmin: [User] @join__field(graph: USER_SUBGRAPH)
+  userByIDForAdmin(id: ID): User @join__field(graph: USER_SUBGRAPH)
+  signin(role: Role, singinData: SigninInput): Signin @join__field(graph: USER_SUBGRAPH)
 }
 
 type Question
@@ -149,17 +201,30 @@ input QuizInput
   questions: [QuestionInput]
 }
 
-type Score
-  @join__type(graph: QUIZ_SUBGRAPH)
+enum Role
+  @join__type(graph: USER_SUBGRAPH)
 {
-  scoreID: ID
+  STUDENT @join__enumValue(graph: USER_SUBGRAPH)
+  INSTRUCTOR @join__enumValue(graph: USER_SUBGRAPH)
+  ADMIN @join__enumValue(graph: USER_SUBGRAPH)
+}
+
+type Score
+  @join__type(graph: ACHIEVEMENT_SUBGRAPH, key: "scoreID")
+{
+  scoreID: ID!
+  userID: ID!
+  quizID: ID!
+  quizName: String
   score: Int
+  date: String
 }
 
 type Signin
   @join__type(graph: USER_SUBGRAPH)
 {
   token: String
+  userData: User
 }
 
 input SigninInput
@@ -169,42 +234,26 @@ input SigninInput
   password: String
 }
 
-type Tutorial
-  @join__type(graph: COURSE_SUBGRAPH)
-{
-  tutID: ID!
-  topicTitle: String
-  description: String
-  paragraphs: [paragraph]
-  authorId: ID!
-  category: String
-}
-
-input TutorialInputs
-  @join__type(graph: COURSE_SUBGRAPH)
-{
-  tutID: ID!
-  topicTitle: String
-  description: String
-  paragraphs: [paragraphInputs]
-}
-
 type User
-  @join__type(graph: QUIZ_SUBGRAPH, key: "userID")
+  @join__type(graph: ACHIEVEMENT_SUBGRAPH, key: "userID")
+  @join__type(graph: COURSE_SUBGRAPH, key: "userID")
   @join__type(graph: USER_SUBGRAPH, key: "userID")
 {
-  userID: ID! @join__field(graph: QUIZ_SUBGRAPH, external: true) @join__field(graph: USER_SUBGRAPH)
-  scores: [Score] @join__field(graph: QUIZ_SUBGRAPH)
+  userID: ID! @join__field(graph: ACHIEVEMENT_SUBGRAPH, external: true) @join__field(graph: COURSE_SUBGRAPH, external: true) @join__field(graph: USER_SUBGRAPH)
+  scores: [Score] @join__field(graph: ACHIEVEMENT_SUBGRAPH)
+  enrollments: [Enrollment] @join__field(graph: COURSE_SUBGRAPH)
+  coursesCreatedBy: [Course] @join__field(graph: COURSE_SUBGRAPH)
   username: String @join__field(graph: USER_SUBGRAPH)
   email: String @join__field(graph: USER_SUBGRAPH)
-  role: String @join__field(graph: USER_SUBGRAPH)
+  role: Role @join__field(graph: USER_SUBGRAPH)
+  createdAt: DateTime! @join__field(graph: USER_SUBGRAPH)
 }
 
 input UserInput
   @join__type(graph: USER_SUBGRAPH)
 {
+  userID: ID!
   username: String!
   email: String!
   password: String!
-  role: String!
 }

@@ -12,16 +12,6 @@ type Quiz @key(fields: quizID) {
   questions: [Question]
 }
 
-type Score {
-  scoreID: ID
-  score: Int
-}
-
-extend type User @key(fields: userID) {
-  userID: ID! @external
-  scores: [Score]
-}
-
 type Question {
   questionID: ID!
   questionType: String

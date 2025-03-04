@@ -52,6 +52,7 @@ services:
       - "8082:8082"
     volumes:
       - ./quizService:/app/
+
     depends_on:
       - quiz_psql
     env_file:
@@ -75,7 +76,7 @@ services:
       POSTGRES_DB: quiz-db
   # ---------------------------------------
 
-  # ------------ Tutorials -----------------
+  # ------------ Courses -----------------
   course_service:
     build:
       context: ./courseService
@@ -111,6 +112,46 @@ services:
       POSTGRES_PASSWORD: psql123
       POSTGRES_DB: course-db
     # ---------------------------------------
+    # ---------------------------------------
+
+
+    # ------------ Achievements -----------------
+  achievement_service:
+    build:
+      context: ./achievementService
+      dockerfile: Dockerfile
+      target: dev
+    container_name: achievement-subgraph-container
+    networks:
+      - e_learning_app_network
+      - achievement_service_Network
+    ports:
+      - "8084:8084"
+    volumes:
+      - ./achievementService:/app/
+
+    depends_on:
+      - achievement_psql
+    env_file:
+      - .env
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+
+  achievement_psql:
+    image: postgres:latest
+    container_name: achievement_psql_container
+    restart: always
+    networks:
+      - achievement_service_Network
+    volumes:
+      - achievement_psql_volume:/var/lib/postgresql/data
+    ports:
+      - "5431:5432"
+    environment:
+      POSTGRES_USER: psql
+      POSTGRES_PASSWORD: psql123
+      POSTGRES_DB: achievement-db
+    # ---------------------------------------
 
   apollo_router:
     # image: ghcr.io/apollographql/router:v1.47.0
@@ -139,8 +180,13 @@ networks:
     driver: bridge
   course_service_Network:
     driver: bridge
+  achievement_service_Network:
+    driver: bridge
 
 volumes:
   quiz_psql_volume:
   course_psql_volume:
   user_psql_volume:
+  achievement_psql_volume:
+
+
